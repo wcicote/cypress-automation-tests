@@ -1,59 +1,48 @@
 ///<reference types='cypress'/>
 
 describe('Login', () => {
-  it('login com Sucesso', () => {
+
+  const usuarioValido = 'Admin';
+  const senhaValida = 'admin123';
+  const senhaIncorreta = 'admin';
+  const usuarioIncorreto = 'Adm';
+
+  beforeEach(() => {
     cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(2) > .oxd-input-group > :nth-child(2) > .oxd-input').type('Admin')
-    cy.get(':nth-child(3) > .oxd-input-group > :nth-child(2) > .oxd-input').type('admin123')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-topbar-header-breadcrumb > .oxd-text').should('have.text', 'Dashboard')
+  });
+  
+  it('login com Sucesso', () => {
+    cy.login(usuarioValido, senhaValida)
+    cy.get('.oxd-topbar-header-breadcrumb > .oxd-text').should('have.text', 'Dashboard');
   })
 
   it('Username Vazio', () => {
-    cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(3) > .oxd-input-group > :nth-child(2) > .oxd-input').type('admin123')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-input-group > .oxd-text').should('have.text', 'Required')
+    cy.login("", senhaValida)
+    cy.validarMensagensDeErro('.oxd-input-field-error-message', 1, 'Required');
   })
 
   it('Password Vazio', () => {
-    cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(2) > .oxd-input-group > :nth-child(2) > .oxd-input').type('Admin')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-input-group > .oxd-text').should('have.text', 'Required')
+    cy.login(usuarioValido, "")
+    cy.validarMensagensDeErro('.oxd-input-field-error-message', 1, 'Required');
 })
 
 it('Username e Password Vazio', () => {
-  cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-  cy.get('.oxd-button').click()
-  cy.get(':nth-child(2) > .oxd-input-group > .oxd-text').should('have.text', 'Required' )
-  cy.get(':nth-child(3) > .oxd-input-group > .oxd-text').should('have.text', 'Required' )
+  cy.login('', '')
+  cy.validarMensagensDeErro('.oxd-input-field-error-message', 2, 'Required');
 });
 
 it('Username Incorreto', () => {
-  cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(2) > .oxd-input-group > :nth-child(2) > .oxd-input').type('aabbcc')
-    cy.get(':nth-child(3) > .oxd-input-group > :nth-child(2) > .oxd-input').type('admin123')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-alert-content > .oxd-text').should('have.text', 'Invalid credentials')
-    cy.get('.oxd-alert-content > .oxd-icon').should('be.visible')
+  cy.login(usuarioIncorreto, senhaValida)
+    cy.validarMensagensDeErro('.oxd-alert-content > .oxd-text', 1, 'Invalid credentials');
 });
 
 it('Password Incorreto', () => {
-  cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(2) > .oxd-input-group > :nth-child(2) > .oxd-input').type('Admin')
-    cy.get(':nth-child(3) > .oxd-input-group > :nth-child(2) > .oxd-input').type('admin')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-alert-content > .oxd-text').should('have.text', 'Invalid credentials')
-    cy.get('.oxd-alert-content > .oxd-icon').should('be.visible')
+  cy.login(usuarioValido, senhaIncorreta)
+    cy.validarMensagensDeErro('.oxd-alert-content > .oxd-text', 1, 'Invalid credentials');
 });
 
 it('Username e Password Incorreto', () => {
-  cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login')
-    cy.get(':nth-child(2) > .oxd-input-group > :nth-child(2) > .oxd-input').type('adm')
-    cy.get(':nth-child(3) > .oxd-input-group > :nth-child(2) > .oxd-input').type('adm')
-    cy.get('.oxd-button').click()
-    cy.get('.oxd-alert-content > .oxd-text').should('have.text', 'Invalid credentials')
-    cy.get('.oxd-alert-content > .oxd-icon').should('be.visible')
+  cy.login(usuarioIncorreto, senhaIncorreta)
+    cy.validarMensagensDeErro('.oxd-alert-content > .oxd-text', 1, 'Invalid credentials');
 });
 })
